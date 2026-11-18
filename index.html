@@ -1,0 +1,663 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>Dai Muda</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800;900&family=Amiri:wght@400;700&display=swap">
+<style>
+/* Konsep: aplikasi belajar seluler dengan tombol tebal 3D, jalur latihan harian, gelembung dalil Arab, dan kartu cerita bergambar. */
+:root{
+  --bg:#f3f7f2; --card:#ffffff; --ink:#1b2a23; --mute:#5f7168; --line:#dbe6de; --line-d:#c4d2c8;
+  --brand:#17895b; --brand-d:#0f6844; --brand-soft:#dcf3e6; --on-brand:#ffffff;
+  --gold:#f0b400; --gold-soft:#fff3cc; --flame:#ef6c1a;
+  --sky:#1b74d1; --sky-d:#13579f; --sky-soft:#ddecfb;
+  --bad:#d63a3f; --bad-d:#a52a2e; --bad-soft:#fde5e5; --on-bad:#ffffff;
+  --nav:#ffffff;
+  --f-body:'Nunito',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --f-ar:'Amiri','Noto Naskh Arabic','Traditional Arabic',serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0e1914; --card:#16251e; --ink:#e8f2ec; --mute:#98ada2; --line:#26392f; --line-d:#1c2c24;
+  --brand:#3ccf92; --brand-d:#1f9a68; --brand-soft:#15392a; --on-brand:#05241a;
+  --gold:#f5c542; --gold-soft:#3a3010; --flame:#ff8a3d;
+  --sky:#5ab0ff; --sky-d:#2f7fcb; --sky-soft:#12304d;
+  --bad:#ff7b7f; --bad-d:#c24a4e; --bad-soft:#3b1c1e; --on-bad:#2a0709;
+  --nav:#16251e; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e1914; --card:#16251e; --ink:#e8f2ec; --mute:#98ada2; --line:#26392f; --line-d:#1c2c24;
+  --brand:#3ccf92; --brand-d:#1f9a68; --brand-soft:#15392a; --on-brand:#05241a;
+  --gold:#f5c542; --gold-soft:#3a3010; --flame:#ff8a3d;
+  --sky:#5ab0ff; --sky-d:#2f7fcb; --sky-soft:#12304d;
+  --bad:#ff7b7f; --bad-d:#c24a4e; --bad-soft:#3b1c1e; --on-bad:#2a0709;
+  --nav:#16251e; color-scheme:dark}
+
+*{box-sizing:border-box}
+html,body{min-height:100%}
+body{
+  background:var(--bg); color:var(--ink); font-family:var(--f-body); font-size:16px; line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px)); padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:0; -webkit-tap-highlight-color:transparent;
+}
+button,input{font:inherit;color:inherit}
+h1,h2,h3,p{margin:0}
+h1,h2,h3{text-wrap:balance;line-height:1.25}
+.ar{font-family:var(--f-ar);direction:rtl;line-height:1.9}
+:focus-visible{outline:3px solid var(--sky);outline-offset:2px;border-radius:8px}
+svg{display:block}
+
+.wrap{max-width:560px;margin:0 auto;padding-block:18px 110px}
+.card{background:var(--card);border:2px solid var(--line);border-radius:20px;padding:16px}
+.mute{color:var(--mute)}
+.small{font-size:13px}
+.stack{display:flex;flex-direction:column;gap:14px}
+.row{display:flex;align-items:center;gap:10px}
+.grow{flex:1;min-width:0}
+
+/* tombol */
+.btn{display:block;width:100%;border:0;border-radius:16px;padding:14px 18px;font-weight:900;font-size:15px;letter-spacing:.05em;
+  text-transform:uppercase;text-align:center;cursor:pointer;color:var(--on-brand);background:var(--brand);box-shadow:0 4px 0 var(--brand-d);
+  transition:transform .08s,box-shadow .08s}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--brand-d)}
+.btn:disabled{background:var(--line);color:var(--mute);box-shadow:0 4px 0 var(--line-d);cursor:not-allowed}
+.btn.bad{background:var(--bad);color:var(--on-bad);box-shadow:0 4px 0 var(--bad-d)}
+.btn.ghost{background:var(--card);color:var(--sky);border:2px solid var(--line);box-shadow:0 4px 0 var(--line)}
+.btn.gold{background:var(--gold);color:#2b2000;box-shadow:0 4px 0 #b08600}
+.iconbtn{border:0;background:none;padding:6px;cursor:pointer;color:var(--mute);border-radius:10px;display:grid;place-items:center}
+
+/* statistik */
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{display:flex;align-items:center;gap:6px;font-weight:900;padding:6px 12px;border-radius:999px;background:var(--card);border:2px solid var(--line)}
+.chip svg{width:20px;height:20px}
+.c-flame{color:var(--flame)}.c-gem{color:var(--sky)}.c-xp{color:var(--gold)}.c-heart{color:var(--bad)}
+
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.hi{color:var(--mute);font-weight:700;font-size:14px}
+.top h1{font-size:26px;font-weight:900}
+
+/* latihan harian */
+.daily{background:var(--brand);color:var(--on-brand);border:0;border-radius:24px;padding:20px;box-shadow:0 5px 0 var(--brand-d)}
+.daily h2{font-size:22px;font-weight:900}
+.daily p{opacity:.92;font-weight:700;margin-top:4px}
+.daily .btn{margin-top:16px;background:var(--card);color:var(--brand-d);box-shadow:0 4px 0 var(--line-d)}
+:root[data-theme="dark"] .daily .btn{color:var(--brand)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .daily .btn{color:var(--brand)}}
+.week{display:flex;justify-content:space-between;gap:6px}
+.day{flex:1;min-width:0;text-align:center;font-size:12px;font-weight:800;color:var(--mute)}
+.day i{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;margin:4px auto 0;border:2px solid var(--line);font-style:normal;font-size:14px}
+.day.done i{background:var(--brand);border-color:var(--brand);color:var(--on-brand)}
+.day.now i{border-color:var(--sky);color:var(--sky)}
+.day.done.now i{color:var(--on-brand)}
+
+/* dalil */
+.dalil{border-radius:18px;background:var(--gold-soft);padding:14px 16px;border:2px solid color-mix(in srgb,var(--gold) 45%,transparent)}
+.dalil .kind{font-weight:900;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute)}
+.dalil .ar{font-size:24px;margin:6px 0 4px;color:var(--ink)}
+.dalil .id{font-weight:700}
+.dalil .src{font-size:13px;color:var(--mute);margin-top:4px}
+
+/* daftar kisah */
+.story{display:flex;gap:14px;align-items:center;width:100%;text-align:left;cursor:pointer;background:var(--card);border:2px solid var(--line);border-bottom-width:5px;border-radius:20px;padding:12px 14px}
+.story:active{transform:translateY(2px);border-bottom-width:3px}
+.story .ic{flex:none;width:56px;height:56px;border-radius:16px;display:grid;place-items:center;font-size:30px;background:color-mix(in srgb,var(--c) 24%,var(--card))}
+.story h3{font-size:17px;font-weight:900}
+.story .ok{flex:none;color:var(--brand);font-weight:900}
+
+/* layar penuh */
+.screen{position:fixed;inset:0;z-index:30;background:var(--bg);display:flex;flex-direction:column;
+  padding:env(safe-area-inset-top,0px) max(16px,env(safe-area-inset-right,0px)) env(safe-area-inset-bottom,0px) max(16px,env(safe-area-inset-left,0px))}
+.screen>.in{width:100%;max-width:560px;margin:0 auto;display:flex;flex-direction:column;flex:1;min-height:0}
+.lhead{display:flex;align-items:center;gap:12px;padding:14px 0}
+.bar{flex:1;height:16px;background:var(--line);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--brand);border-radius:99px;transition:width .3s}
+.lbody{flex:1;min-height:0;overflow-y:auto;padding:8px 0 20px}
+.tag{display:inline-block;font-weight:900;font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:4px 10px;border-radius:99px;background:var(--brand-soft);color:var(--brand)}
+.lbody h2{font-size:23px;font-weight:900;margin:12px 0 18px}
+.opts{display:flex;flex-direction:column;gap:10px}
+.opt{width:100%;text-align:left;background:var(--card);border:2px solid var(--line);border-bottom-width:5px;border-radius:16px;padding:13px 16px;font-weight:800;cursor:pointer}
+.opt.sel{border-color:var(--sky);background:var(--sky-soft)}
+.opt.right{border-color:var(--brand);background:var(--brand-soft)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.opt:disabled{cursor:default}
+.lfoot{margin:0 calc(-1 * max(16px,env(safe-area-inset-left,0px)));padding:14px max(16px,env(safe-area-inset-right,0px)) 16px max(16px,env(safe-area-inset-left,0px));
+  border-top:2px solid var(--line);max-height:58vh;overflow-y:auto}
+.lfoot.ok{background:var(--brand-soft);border-color:var(--brand)}
+.lfoot.no{background:var(--bad-soft);border-color:var(--bad)}
+.lfoot .verdict{font-weight:900;font-size:19px;margin-bottom:8px}
+.lfoot.ok .verdict{color:var(--brand)}.lfoot.no .verdict{color:var(--bad)}
+.lfoot .dalil{margin-bottom:12px;background:var(--card)}
+
+.big{font-size:64px;font-weight:900;line-height:1}
+.center{text-align:center}
+.pad{padding-block:28px}
+
+/* kisah */
+.art{height:230px;border-radius:26px;display:grid;place-items:center;font-size:104px;background:color-mix(in srgb,var(--c) 26%,var(--card));margin-bottom:18px}
+.scene{font-size:19px;font-weight:700;line-height:1.65}
+.dots{display:flex;gap:6px;flex:1}
+.dots i{flex:1;height:8px;border-radius:99px;background:var(--line)}
+.dots i.on{background:var(--brand)}
+.navrow{display:flex;gap:10px;padding:12px 0 16px}
+
+/* gem match */
+.mgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.mcol{display:flex;flex-direction:column;gap:10px}
+.mc{min-height:64px;display:grid;place-items:center;text-align:center;padding:8px 6px;cursor:pointer;background:var(--card);border:2px solid var(--line);border-bottom-width:5px;border-radius:16px;font-weight:800;font-size:15px;word-break:break-word}
+.mc.ar{font-family:var(--f-ar);font-size:26px;font-weight:700;direction:rtl}
+.mc.sel{border-color:var(--sky);background:var(--sky-soft)}
+.mc.done{opacity:.28;pointer-events:none;border-color:var(--brand)}
+.mc.bad{border-color:var(--bad);background:var(--bad-soft);animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.mhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.vocab{width:100%;border-collapse:collapse;font-size:14px}
+.vocab th,.vocab td{padding:8px 6px;border-bottom:1px solid var(--line);text-align:left}
+.vocab td.a{font-family:var(--f-ar);font-size:22px;direction:rtl;text-align:right}
+.scrollx{overflow-x:auto;max-height:340px;overflow-y:auto}
+
+/* login */
+.login{min-height:100vh;display:flex;flex-direction:column;justify-content:center;max-width:420px;margin:0 auto;padding-block:32px;gap:18px}
+.logo{width:76px;height:76px;margin:0 auto}
+.login h1{font-size:30px;font-weight:900;text-align:center}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-weight:800;font-size:14px}
+.input{width:100%;padding:13px 14px;border-radius:14px;border:2px solid var(--line);background:var(--card);font-weight:700}
+.input:focus{border-color:var(--sky);outline:none}
+.err{color:var(--bad);font-weight:800;font-size:14px;min-height:20px}
+details.qr{border:2px solid var(--line);border-radius:18px;background:var(--card);padding:12px 16px}
+details.qr summary{font-weight:900;cursor:pointer}
+.qrbox{background:#fff;padding:12px;border-radius:14px;width:fit-content;margin:12px auto 0;line-height:0}
+.qrbox img,.qrbox canvas{max-width:100%;height:auto}
+
+/* navigasi bawah */
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--nav);border-top:2px solid var(--line);
+  padding:6px max(16px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.nav .in{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+.nav button{border:0;background:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px;border-radius:14px;color:var(--mute);font-weight:800;font-size:12px}
+.nav button svg{width:26px;height:26px}
+.nav button.on{color:var(--sky);background:var(--sky-soft)}
+.avatar{width:64px;height:64px;border-radius:50%;background:var(--brand);color:var(--on-brand);display:grid;place-items:center;font-size:28px;font-weight:900}
+.kv{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.kv div{text-align:center;padding:12px 6px;border-radius:16px;border:2px solid var(--line);background:var(--card)}
+.kv b{display:block;font-size:22px;font-weight:900}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+</head>
+<body>
+<div id="root"></div>
+<div id="overlay"></div>
+
+<script>
+"use strict";
+/* ---------- akun (hanya hash SHA-256 yang disimpan) ---------- */
+const USERS = {
+  ustadz: { name: `Ustadz Pembina`, role: `Admin`, h: `07425b48b6b884795900e64e3b2b48cd78b42903257b6aa5664bb3fcd59b7484` },
+  dai01:  { name: `Dai Muda 01`,    role: `Peserta`, h: `43c5275f20e97775b674a261e1a9683b8d6c599caa9d6624123571b144068d01` },
+  tamu:   { name: `Tamu`,           role: `Tamu`, h: `29c0c6bc714517a101b934cb55db3fa602da487d3083d24e178ff23c990e8b4a` }
+};
+
+/* ---------- bank soal ---------- */
+const BANK = [];
+function Q(cat, q, a, w, d){ BANK.push({cat, q, a, w, d:{k:d[0], ar:d[1], id:d[2], src:d[3]}}); }
+
+Q(`Akidah`,`Berapa jumlah rukun Islam?`,`Lima`,[`Empat`,`Enam`,`Tujuh`],
+  [`Hadis`,`بُنِيَ الْإِسْلَامُ عَلَى خَمْسٍ`,`Islam dibangun di atas lima perkara: syahadat, shalat, zakat, puasa Ramadhan, dan haji.`,`HR. Bukhari dan Muslim`]);
+Q(`Akidah`,`Berapa jumlah rukun iman?`,`Enam`,[`Lima`,`Tujuh`,`Delapan`],
+  [`Hadis`,`أَنْ تُؤْمِنَ بِاللَّهِ وَمَلَائِكَتِهِ وَكُتُبِهِ وَرُسُلِهِ وَالْيَوْمِ الْآخِرِ وَتُؤْمِنَ بِالْقَدَرِ خَيْرِهِ وَشَرِّهِ`,`Engkau beriman kepada Allah, malaikat-Nya, kitab-kitab-Nya, rasul-rasul-Nya, hari akhir, dan takdir yang baik maupun yang buruk.`,`HR. Muslim (hadis Jibril)`]);
+Q(`Ibadah`,`Amal seseorang dinilai sesuai dengan apa?`,`Niatnya`,[`Banyaknya`,`Pujian orang`,`Waktunya`],
+  [`Hadis`,`إِنَّمَا الْأَعْمَالُ بِالنِّيَّاتِ وَإِنَّمَا لِكُلِّ امْرِئٍ مَا نَوَى`,`Sesungguhnya amal itu tergantung niatnya, dan setiap orang mendapat sesuai apa yang ia niatkan.`,`HR. Bukhari dan Muslim`]);
+Q(`Dakwah`,`Menurut QS. An-Nahl:125, dakwah dengan hikmah, nasihat yang baik, dan...`,`Berdebat dengan cara terbaik`,[`Memaksa`,`Mengancam`,`Menghindar`],
+  [`Al-Qur'an`,`ادْعُ إِلَىٰ سَبِيلِ رَبِّكَ بِالْحِكْمَةِ وَالْمَوْعِظَةِ الْحَسَنَةِ ۖ وَجَادِلْهُم بِالَّتِي هِيَ أَحْسَنُ`,`Serulah (manusia) ke jalan Tuhanmu dengan hikmah dan pengajaran yang baik, dan bantahlah mereka dengan cara yang paling baik.`,`QS. An-Nahl: 125`]);
+Q(`Dakwah`,`Nabi ﷺ bersabda: "Sampaikanlah dariku walau..."`,`Satu ayat`,[`Satu kitab`,`Satu hari`,`Satu kalimat dusta`],
+  [`Hadis`,`بَلِّغُوا عَنِّي وَلَوْ آيَةً`,`Sampaikanlah dariku, walau hanya satu ayat.`,`HR. Bukhari`]);
+Q(`Al-Qur'an`,`Siapa manusia terbaik menurut hadis tentang Al-Qur'an?`,`Yang belajar dan mengajarkannya`,[`Yang paling kaya`,`Yang paling banyak pengikut`,`Yang paling keras suaranya`],
+  [`Hadis`,`خَيْرُكُمْ مَنْ تَعَلَّمَ الْقُرْآنَ وَعَلَّمَهُ`,`Sebaik-baik kalian adalah orang yang belajar Al-Qur'an dan mengajarkannya.`,`HR. Bukhari`]);
+Q(`Al-Qur'an`,`Surah pembuka Al-Qur'an adalah...`,`Al-Fatihah`,[`Al-Baqarah`,`Al-Ikhlas`,`An-Nas`],
+  [`Al-Qur'an`,`الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ`,`Segala puji bagi Allah, Tuhan semesta alam.`,`QS. Al-Fatihah: 2`]);
+Q(`Al-Qur'an`,`Wahyu pertama yang turun diawali dengan kata...`,`Iqra' (bacalah)`,[`Qul (katakanlah)`,`Alhamdulillah`,`Subhanallah`],
+  [`Al-Qur'an`,`اقْرَأْ بِاسْمِ رَبِّكَ الَّذِي خَلَقَ`,`Bacalah dengan (menyebut) nama Tuhanmu yang menciptakan.`,`QS. Al-'Alaq: 1`]);
+Q(`Al-Qur'an`,`Surah Al-Ikhlas setara berapa bagian Al-Qur'an menurut hadis?`,`Sepertiga`,[`Seperempat`,`Setengah`,`Seperlima`],
+  [`Hadis`,`قُلْ هُوَ اللَّهُ أَحَدٌ تَعْدِلُ ثُلُثَ الْقُرْآنِ`,`Surah "Qul huwallahu ahad" setara dengan sepertiga Al-Qur'an.`,`HR. Bukhari dan Muslim`]);
+Q(`Al-Qur'an`,`Ayat Kursi terdapat dalam surah...`,`Al-Baqarah`,[`Ali Imran`,`An-Nisa`,`Yasin`],
+  [`Al-Qur'an`,`اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ`,`Allah, tidak ada tuhan selain Dia, Yang Maha Hidup dan terus-menerus mengurus makhluk-Nya.`,`QS. Al-Baqarah: 255`]);
+Q(`Ibadah`,`Tujuan puasa menurut QS. Al-Baqarah:183 agar kita menjadi...`,`Orang yang bertakwa`,[`Orang kaya`,`Orang terkenal`,`Orang kuat`],
+  [`Al-Qur'an`,`يَا أَيُّهَا الَّذِينَ آمَنُوا كُتِبَ عَلَيْكُمُ الصِّيَامُ كَمَا كُتِبَ عَلَى الَّذِينَ مِن قَبْلِكُمْ لَعَلَّكُمْ تَتَّقُونَ`,`Wahai orang-orang beriman, diwajibkan atas kamu berpuasa sebagaimana diwajibkan atas orang sebelum kamu agar kamu bertakwa.`,`QS. Al-Baqarah: 183`]);
+Q(`Ibadah`,`Shalat fardhu memiliki ketentuan...`,`Waktu yang telah ditetapkan`,[`Boleh kapan saja`,`Hanya di masjid`,`Hanya hari Jumat`],
+  [`Al-Qur'an`,`إِنَّ الصَّلَاةَ كَانَتْ عَلَى الْمُؤْمِنِينَ كِتَابًا مَّوْقُوتًا`,`Sesungguhnya shalat itu adalah kewajiban yang waktunya telah ditentukan atas orang-orang beriman.`,`QS. An-Nisa: 103`]);
+Q(`Ibadah`,`Dalam Al-Qur'an, perintah zakat sering disebut bersama perintah...`,`Shalat`,[`Umrah`,`Berburu`,`Berdagang`],
+  [`Al-Qur'an`,`وَأَقِيمُوا الصَّلَاةَ وَآتُوا الزَّكَاةَ وَارْكَعُوا مَعَ الرَّاكِعِينَ`,`Dirikanlah shalat, tunaikanlah zakat, dan rukuklah bersama orang-orang yang rukuk.`,`QS. Al-Baqarah: 43`]);
+Q(`Ibadah`,`Bersuci adalah separuh dari...`,`Iman`,[`Ilmu`,`Kekayaan`,`Kesehatan`],
+  [`Hadis`,`الطُّهُورُ شَطْرُ الْإِيمَانِ`,`Bersuci itu separuh dari iman.`,`HR. Muslim`]);
+Q(`Akhlak`,`Nabi ﷺ diutus untuk menyempurnakan...`,`Akhlak yang mulia`,[`Kekuasaan`,`Perdagangan`,`Bangunan`],
+  [`Hadis`,`إِنَّمَا بُعِثْتُ لِأُتَمِّمَ مَكَارِمَ الْأَخْلَاقِ`,`Sesungguhnya aku diutus untuk menyempurnakan akhlak yang mulia.`,`HR. Ahmad dan Al-Baihaqi`]);
+Q(`Akhlak`,`Senyum kepada saudaramu bernilai...`,`Sedekah`,[`Dosa`,`Tidak bernilai`,`Utang`],
+  [`Hadis`,`تَبَسُّمُكَ فِي وَجْهِ أَخِيكَ لَكَ صَدَقَةٌ`,`Senyummu di hadapan saudaramu adalah sedekah bagimu.`,`HR. At-Tirmidzi`]);
+Q(`Akhlak`,`Orang yang kuat menurut hadis adalah yang...`,`Mampu menahan diri saat marah`,[`Menang bergulat`,`Paling berotot`,`Paling ditakuti`],
+  [`Hadis`,`لَيْسَ الشَّدِيدُ بِالصُّرَعَةِ إِنَّمَا الشَّدِيدُ الَّذِي يَمْلِكُ نَفْسَهُ عِنْدَ الْغَضَبِ`,`Orang kuat bukanlah yang menang bergulat, tetapi yang mampu menguasai dirinya ketika marah.`,`HR. Bukhari dan Muslim`]);
+Q(`Akhlak`,`Siapa yang paling berhak mendapat bakti terbaik menurut hadis?`,`Ibu`,[`Guru`,`Teman`,`Tetangga`],
+  [`Hadis`,`أُمُّكَ ثُمَّ أُمُّكَ ثُمَّ أُمُّكَ ثُمَّ أَبُوكَ`,`Ibumu, kemudian ibumu, kemudian ibumu, kemudian ayahmu.`,`HR. Bukhari dan Muslim`]);
+Q(`Akhlak`,`Orang beriman hendaknya berkata baik atau...`,`Diam`,[`Bergurau`,`Berdebat`,`Menjauh`],
+  [`Hadis`,`مَنْ كَانَ يُؤْمِنُ بِاللَّهِ وَالْيَوْمِ الْآخِرِ فَلْيَقُلْ خَيْرًا أَوْ لِيَصْمُتْ`,`Barang siapa beriman kepada Allah dan hari akhir, hendaklah berkata baik atau diam.`,`HR. Bukhari dan Muslim`]);
+Q(`Dakwah`,`Orang yang menunjukkan kepada kebaikan mendapat pahala...`,`Seperti pahala pelakunya`,[`Separuhnya`,`Tidak ada`,`Hanya pujian`],
+  [`Hadis`,`مَنْ دَلَّ عَلَى خَيْرٍ فَلَهُ مِثْلُ أَجْرِ فَاعِلِهِ`,`Barang siapa menunjukkan kepada kebaikan, ia mendapat pahala seperti pahala orang yang mengerjakannya.`,`HR. Muslim`]);
+Q(`Dakwah`,`Nabi ﷺ bersabda: "Agama adalah..."`,`Nasihat`,[`Pakaian`,`Kekuasaan`,`Tradisi`],
+  [`Hadis`,`الدِّينُ النَّصِيحَةُ`,`Agama itu nasihat.`,`HR. Muslim`]);
+Q(`Dakwah`,`Menurut QS. Fushshilat:33, siapa yang paling baik perkataannya?`,`Yang menyeru kepada Allah dan beramal saleh`,[`Yang pandai berpidato`,`Yang paling terkenal`,`Yang paling banyak berdebat`],
+  [`Al-Qur'an`,`وَمَنْ أَحْسَنُ قَوْلًا مِّمَّن دَعَا إِلَى اللَّهِ وَعَمِلَ صَالِحًا وَقَالَ إِنَّنِي مِنَ الْمُسْلِمِينَ`,`Siapakah yang lebih baik perkataannya daripada orang yang menyeru kepada Allah, mengerjakan kebajikan, dan berkata: aku termasuk orang muslim?`,`QS. Fushshilat: 33`]);
+Q(`Dakwah`,`QS. Ali Imran:104 memerintahkan adanya sekelompok umat yang...`,`Menyeru kepada kebaikan dan mencegah kemungkaran`,[`Hanya berdagang`,`Menyendiri dari masyarakat`,`Memerangi tetangga`],
+  [`Al-Qur'an`,`وَلْتَكُن مِّنكُمْ أُمَّةٌ يَدْعُونَ إِلَى الْخَيْرِ وَيَأْمُرُونَ بِالْمَعْرُوفِ وَيَنْهَوْنَ عَنِ الْمُنكَرِ`,`Hendaklah ada di antara kamu segolongan umat yang menyeru kepada kebaikan, menyuruh kepada yang makruf, dan mencegah dari yang mungkar.`,`QS. Ali Imran: 104`]);
+Q(`Kisah Nabi`,`Nabi yang dijuluki Khalilullah (kekasih Allah) adalah...`,`Ibrahim`,[`Musa`,`Nuh`,`Isa`],
+  [`Al-Qur'an`,`وَاتَّخَذَ اللَّهُ إِبْرَاهِيمَ خَلِيلًا`,`Dan Allah mengambil Ibrahim menjadi kesayangan-Nya.`,`QS. An-Nisa: 125`]);
+Q(`Kisah Nabi`,`Nabi yang berdoa di dalam perut ikan adalah...`,`Yunus`,[`Ayyub`,`Musa`,`Yusuf`],
+  [`Al-Qur'an`,`لَّا إِلَٰهَ إِلَّا أَنتَ سُبْحَانَكَ إِنِّي كُنتُ مِنَ الظَّالِمِينَ`,`Tidak ada tuhan selain Engkau. Mahasuci Engkau, sungguh aku termasuk orang yang zalim.`,`QS. Al-Anbiya: 87`]);
+Q(`Kisah Nabi`,`Nabi Nuh ﷺ diperintahkan Allah membuat...`,`Bahtera`,[`Menara`,`Benteng`,`Sumur`],
+  [`Al-Qur'an`,`وَاصْنَعِ الْفُلْكَ بِأَعْيُنِنَا وَوَحْيِنَا`,`Buatlah bahtera itu di bawah pengawasan dan petunjuk Kami.`,`QS. Hud: 37`]);
+Q(`Kisah Nabi`,`Apa yang ada di tangan kanan Nabi Musa ﷺ ketika Allah bertanya kepadanya?`,`Tongkat`,[`Cincin`,`Batu`,`Kitab`],
+  [`Al-Qur'an`,`وَمَا تِلْكَ بِيَمِينِكَ يَا مُوسَىٰ`,`Apakah itu yang ada di tangan kananmu, wahai Musa?`,`QS. Thaha: 17`]);
+Q(`Kisah Nabi`,`Nabi Sulaiman ﷺ diajari memahami bahasa...`,`Burung`,[`Ikan`,`Bintang`,`Batu`],
+  [`Al-Qur'an`,`يَا أَيُّهَا النَّاسُ عُلِّمْنَا مَنطِقَ الطَّيْرِ`,`Wahai manusia, kami telah diajari bahasa burung.`,`QS. An-Naml: 16`]);
+Q(`Kisah Nabi`,`Surah yang menyebut "kisah terbaik" adalah...`,`Yusuf`,[`Maryam`,`Hud`,`Al-Kahfi`],
+  [`Al-Qur'an`,`نَحْنُ نَقُصُّ عَلَيْكَ أَحْسَنَ الْقَصَصِ`,`Kami menceritakan kepadamu kisah yang paling baik.`,`QS. Yusuf: 3`]);
+Q(`Kisah Nabi`,`Nabi Ayyub ﷺ menjadi teladan dalam hal...`,`Kesabaran`,[`Perdagangan`,`Peperangan`,`Pembangunan`],
+  [`Al-Qur'an`,`أَنِّي مَسَّنِيَ الضُّرُّ وَأَنتَ أَرْحَمُ الرَّاحِمِينَ`,`Sungguh aku ditimpa penyakit, dan Engkau Maha Penyayang di antara semua penyayang.`,`QS. Al-Anbiya: 83`]);
+Q(`Kisah Nabi`,`Di sisi Allah, Nabi Isa ﷺ diumpamakan seperti siapa?`,`Adam`,[`Nuh`,`Ibrahim`,`Musa`],
+  [`Al-Qur'an`,`إِنَّ مَثَلَ عِيسَىٰ عِندَ اللَّهِ كَمَثَلِ آدَمَ ۖ خَلَقَهُ مِن تُرَابٍ`,`Sesungguhnya perumpamaan Isa di sisi Allah seperti Adam; Dia menciptakannya dari tanah.`,`QS. Ali Imran: 59`]);
+Q(`Sirah`,`Siapa yang menemani Nabi ﷺ di Gua Tsur saat hijrah?`,`Abu Bakar`,[`Umar`,`Utsman`,`Ali`],
+  [`Al-Qur'an`,`إِذْ يَقُولُ لِصَاحِبِهِ لَا تَحْزَنْ إِنَّ اللَّهَ مَعَنَا`,`Ketika ia berkata kepada sahabatnya: janganlah bersedih, sesungguhnya Allah bersama kita.`,`QS. At-Taubah: 40`]);
+Q(`Sirah`,`Kota tujuan hijrah Nabi ﷺ adalah...`,`Madinah`,[`Thaif`,`Habasyah`,`Yerusalem`],
+  [`Al-Qur'an`,`وَالَّذِينَ تَبَوَّءُوا الدَّارَ وَالْإِيمَانَ مِن قَبْلِهِمْ يُحِبُّونَ مَنْ هَاجَرَ إِلَيْهِمْ`,`Orang-orang (Anshar) yang menempati Madinah dan beriman sebelum mereka mencintai orang yang berhijrah kepada mereka.`,`QS. Al-Hasyr: 9`]);
+Q(`Sirah`,`Istri pertama Nabi ﷺ yang selalu mendukung dakwah beliau adalah...`,`Khadijah`,[`Aisyah`,`Hafshah`,`Zainab`],
+  [`Hadis`,``,`Aisyah berkata bahwa ia tidak pernah cemburu kepada istri Nabi ﷺ seperti cemburunya kepada Khadijah, karena Nabi sering menyebut kebaikannya.`,`HR. Bukhari`]);
+Q(`Sirah`,`Sahabat yang bergelar Al-Faruq adalah...`,`Umar bin Khattab`,[`Abu Bakar`,`Utsman bin Affan`,`Ali bin Abi Thalib`],
+  [`Hadis`,`مَا لَقِيَكَ الشَّيْطَانُ قَطُّ سَالِكًا فَجًّا إِلَّا سَلَكَ فَجًّا غَيْرَ فَجِّكَ`,`Tidaklah setan bertemu denganmu di suatu jalan, kecuali ia menempuh jalan lain selain jalanmu (sabda Nabi kepada Umar).`,`HR. Bukhari dan Muslim`]);
+Q(`Sirah`,`Muazin pertama dalam Islam adalah...`,`Bilal bin Rabah`,[`Abdullah bin Zaid`,`Salman Al-Farisi`,`Khalid bin Walid`],
+  [`Hadis`,`قُمْ مَعَ بِلَالٍ فَأَلْقِ عَلَيْهِ مَا رَأَيْتَ فَلْيُؤَذِّنْ بِهِ فَإِنَّهُ أَنْدَى صَوْتًا مِنْكَ`,`Berdirilah bersama Bilal, ajarkan kepadanya apa yang kamu lihat dalam mimpi agar ia mengumandangkan azan, sebab suaranya lebih merdu darimu.`,`HR. Abu Dawud dan Ahmad`]);
+Q(`Sirah`,`Sahabat yang bergelar Dzun Nurain (pemilik dua cahaya) adalah...`,`Utsman bin Affan`,[`Umar bin Khattab`,`Abu Bakar`,`Zubair bin Awwam`],
+  [`Hadis`,`أَلَا أَسْتَحْيِي مِنْ رَجُلٍ تَسْتَحْيِي مِنْهُ الْمَلَائِكَةُ`,`Bagaimana aku tidak malu kepada seorang yang malaikat pun malu kepadanya? (sabda Nabi tentang Utsman).`,`HR. Muslim`]);
+Q(`Maqolah`,`Imam Malik: ilmu itu bukan banyaknya riwayat, melainkan...`,`Cahaya yang Allah letakkan di hati`,[`Gelar yang tinggi`,`Hafalan semata`,`Buku yang tebal`],
+  [`Maqolah`,`لَيْسَ الْعِلْمُ بِكَثْرَةِ الرِّوَايَةِ وَلَكِنَّهُ نُورٌ يَجْعَلُهُ اللَّهُ فِي الْقَلْبِ`,`Ilmu bukanlah dengan banyaknya riwayat, tetapi cahaya yang Allah letakkan di dalam hati.`,`Ucapan yang dinisbatkan kepada Imam Malik rahimahullah`]);
+Q(`Maqolah`,`Ali bin Abi Thalib: ilmu lebih baik daripada harta karena ilmu...`,`Menjagamu`,[`Menjadikanmu kaya`,`Habis jika dipakai`,`Membuatmu sombong`],
+  [`Maqolah`,`الْعِلْمُ خَيْرٌ مِنَ الْمَالِ، الْعِلْمُ يَحْرُسُكَ وَأَنْتَ تَحْرُسُ الْمَالَ`,`Ilmu lebih baik daripada harta. Ilmu menjagamu, sedangkan engkau yang menjaga harta.`,`Ucapan yang dinisbatkan kepada Ali bin Abi Thalib radhiyallahu 'anhu`]);
+Q(`Maqolah`,`Ucapan yang dinisbatkan kepada Imam Syafi'i: siapa yang menginginkan dunia dan akhirat hendaklah dengan...`,`Ilmu`,[`Harta`,`Jabatan`,`Keturunan`],
+  [`Maqolah`,`مَنْ أَرَادَ الدُّنْيَا فَعَلَيْهِ بِالْعِلْمِ، وَمَنْ أَرَادَ الْآخِرَةَ فَعَلَيْهِ بِالْعِلْمِ`,`Siapa yang menginginkan dunia, hendaklah dengan ilmu; siapa yang menginginkan akhirat, hendaklah dengan ilmu.`,`Ucapan yang dinisbatkan kepada Imam Asy-Syafi'i rahimahullah`]);
+Q(`Maqolah`,`Ibnu Atha'illah: jangan tinggalkan dzikir hanya karena...`,`Hatimu belum hadir`,[`Waktumu sempit`,`Suaramu pelan`,`Tidak ada yang melihat`],
+  [`Maqolah`,`لَا تَتْرُكِ الذِّكْرَ لِعَدَمِ حُضُورِكَ مَعَ اللَّهِ فِيهِ`,`Jangan tinggalkan dzikir karena engkau belum merasa hadir bersama Allah di dalamnya.`,`Al-Hikam, Ibnu Atha'illah As-Sakandari`]);
+Q(`Akidah`,`Siapa malaikat penyampai wahyu kepada para nabi?`,`Jibril`,[`Mikail`,`Israfil`,`Malik`],
+  [`Al-Qur'an`,`نَزَلَ بِهِ الرُّوحُ الْأَمِينُ عَلَىٰ قَلْبِكَ`,`Dibawa turun oleh Ar-Ruh Al-Amin (Jibril) ke dalam hatimu.`,`QS. Asy-Syu'ara: 193-194`]);
+Q(`Akidah`,`Manusia pertama sekaligus nabi pertama adalah...`,`Adam`,[`Nuh`,`Idris`,`Ibrahim`],
+  [`Al-Qur'an`,`إِنِّي جَاعِلٌ فِي الْأَرْضِ خَلِيفَةً`,`Sesungguhnya Aku akan menjadikan seorang khalifah di bumi.`,`QS. Al-Baqarah: 30`]);
+Q(`Akhlak`,`Kemuliaan seseorang di sisi Allah diukur dengan...`,`Ketakwaannya`,[`Keturunannya`,`Hartanya`,`Warna kulitnya`],
+  [`Al-Qur'an`,`إِنَّ أَكْرَمَكُمْ عِندَ اللَّهِ أَتْقَاكُمْ`,`Sesungguhnya yang paling mulia di antara kamu di sisi Allah ialah yang paling bertakwa.`,`QS. Al-Hujurat: 13`]);
+
+/* ---------- kisah ---------- */
+const STORIES = [
+ { id:`nuh`, t:`Nabi Nuh ﷺ`, s:`Sabar dalam berdakwah`, ic:`🚢`, c:`#2b8be8`, scenes:[
+  [`🌍`,`Nabi Nuh ﷺ diutus kepada kaumnya yang menyembah berhala. Beliau mengajak mereka menyembah Allah saja.`],
+  [`🗣️`,`Siang dan malam Nuh berdakwah, dengan sembunyi-sembunyi maupun terang-terangan. Banyak yang menutup telinga dan mengejeknya.`],
+  [`⏳`,`Beliau tinggal bersama kaumnya selama 950 tahun. Yang beriman hanya sedikit, tetapi Nuh tidak berhenti.`],
+  [`🛠️`,`Allah memerintahkan Nuh membuat bahtera. Kaumnya menertawakannya karena ia membangun kapal di daratan.`],
+  [`🌊`,`Air memancar dari bumi dan turun dari langit. Nuh mengajak orang beriman naik bersama pasangan dari tiap jenis hewan. Putranya menolak ikut.`],
+  [`⛰️`,`Banjir surut dan bahtera berlabuh di bukit Judi. Tugas dai adalah menyampaikan; hidayah ada di tangan Allah.`]],
+  h:{ar:`فَلَبِثَ فِيهِمْ أَلْفَ سَنَةٍ إِلَّا خَمْسِينَ عَامًا`, id:`Maka dia tinggal di antara mereka seribu tahun kurang lima puluh tahun.`, src:`QS. Al-'Ankabut: 14`}},
+ { id:`ibrahim`, t:`Nabi Ibrahim ﷺ`, s:`Berani karena tauhid`, ic:`🔥`, c:`#ef6c1a`, scenes:[
+  [`🌙`,`Ibrahim muda mengajak kaumnya berpikir: bintang, bulan, dan matahari semuanya terbenam. Tuhan yang sejati tidak lenyap.`],
+  [`🗿`,`Ia bertanya kepada ayah dan kaumnya, "Patung apa yang kalian sembah?" Mereka menjawab, "Kami mendapati nenek moyang kami menyembahnya."`],
+  [`🔨`,`Ketika kaumnya pergi merayakan hari raya, Ibrahim menghancurkan berhala-berhala itu, kecuali yang paling besar.`],
+  [`❓`,`Mereka marah dan menanyai Ibrahim. Ia menjawab, "Tanyakan saja kepada yang besar itu, jika ia bisa berbicara." Mereka terdiam.`],
+  [`🔥`,`Kaumnya menyalakan api yang sangat besar untuk membakar Ibrahim.`],
+  [`❄️`,`Allah memerintahkan agar api menjadi dingin dan menyelamatkan Ibrahim. Iman yang lurus membuat seorang dai tidak gentar.`]],
+  h:{ar:`قُلْنَا يَا نَارُ كُونِي بَرْدًا وَسَلَامًا عَلَىٰ إِبْرَاهِيمَ`, id:`Kami berfirman: wahai api, jadilah dingin dan penyelamat bagi Ibrahim.`, src:`QS. Al-Anbiya: 69`}},
+ { id:`yunus`, t:`Nabi Yunus ﷺ`, s:`Doa dari kegelapan`, ic:`🐋`, c:`#1c9aa8`, scenes:[
+  [`🏙️`,`Nabi Yunus ﷺ diutus kepada penduduk Ninawa. Beliau mengajak mereka beriman, tetapi mereka menolak.`],
+  [`🚶`,`Yunus pergi meninggalkan kaumnya dalam keadaan marah, sebelum menerima izin dari Allah.`],
+  [`⛵`,`Di atas kapal, undian jatuh kepadanya dan ia dilemparkan ke laut. Seekor ikan besar menelannya.`],
+  [`🤲`,`Dalam gelapnya malam, laut, dan perut ikan, Yunus berdoa, mengakui kesalahannya, dan bertasbih.`],
+  [`🌿`,`Allah menyelamatkannya. Kaumnya pun akhirnya beriman. Doa yang tulus tidak pernah sia-sia.`]],
+  h:{ar:`لَّا إِلَٰهَ إِلَّا أَنتَ سُبْحَانَكَ إِنِّي كُنتُ مِنَ الظَّالِمِينَ`, id:`Tidak ada tuhan selain Engkau. Mahasuci Engkau, sungguh aku termasuk orang yang zalim.`, src:`QS. Al-Anbiya: 87`}},
+ { id:`yusuf`, t:`Nabi Yusuf ﷺ`, s:`Memaafkan dan menjaga diri`, ic:`⭐`, c:`#d9a400`, scenes:[
+  [`⭐`,`Yusuf kecil bermimpi melihat sebelas bintang, matahari, dan bulan sujud kepadanya. Ayahnya, Nabi Ya'qub, memintanya tidak menceritakan mimpi itu kepada saudara-saudaranya.`],
+  [`🕳️`,`Saudara-saudaranya iri dan melemparkan Yusuf ke dalam sumur. Lalu mereka berbohong kepada ayah mereka.`],
+  [`🐪`,`Kafilah dagang menemukannya dan membawanya ke Mesir sebagai budak.`],
+  [`🔒`,`Yusuf menjaga diri dari godaan dan dipenjara walaupun tidak bersalah. Di penjara ia tetap mengajak kepada Allah.`],
+  [`👑`,`Ia menafsirkan mimpi raja, lalu dipercaya mengelola persediaan pangan negeri sehingga rakyat selamat dari paceklik.`],
+  [`🤝`,`Saudara-saudaranya datang dalam kesulitan. Yusuf berkata bahwa tidak ada celaan atas mereka hari itu, dan ia memaafkan.`]],
+  h:{ar:`لَا تَثْرِيبَ عَلَيْكُمُ الْيَوْمَ ۖ يَغْفِرُ اللَّهُ لَكُمْ ۖ وَهُوَ أَرْحَمُ الرَّاحِمِينَ`, id:`Tidak ada celaan atas kamu hari ini. Semoga Allah mengampuni kamu, dan Dia Maha Penyayang di antara para penyayang.`, src:`QS. Yusuf: 92`}},
+ { id:`abubakar`, t:`Abu Bakar di Gua Tsur`, s:`Sahabat setia saat genting`, ic:`🌙`, c:`#6a5acd`, scenes:[
+  [`🕌`,`Kaum Quraisy merencanakan sesuatu yang jahat kepada Nabi ﷺ. Allah mengizinkan beliau berhijrah ke Madinah, ditemani Abu Bakar Ash-Shiddiq.`],
+  [`🌙`,`Pada malam hari mereka berangkat ke Gua Tsur di selatan Makkah dan bersembunyi di sana.`],
+  [`👣`,`Para pengejar tiba di dekat mulut gua. Abu Bakar cemas, "Seandainya salah seorang dari mereka melihat ke bawah kakinya, ia akan melihat kita."`],
+  [`💚`,`Nabi ﷺ menenangkannya, "Bagaimana pendapatmu tentang dua orang, sedangkan Allah yang ketiganya?"`],
+  [`🌅`,`Mereka selamat dan melanjutkan perjalanan hijrah. Persahabatan karena iman membuat Abu Bakar setia di saat paling genting.`]],
+  h:{ar:`إِذْ يَقُولُ لِصَاحِبِهِ لَا تَحْزَنْ إِنَّ اللَّهَ مَعَنَا`, id:`Ketika ia berkata kepada sahabatnya: janganlah bersedih, sesungguhnya Allah bersama kita.`, src:`QS. At-Taubah: 40`}},
+ { id:`bilal`, t:`Bilal bin Rabah`, s:`Suara tauhid dari seorang budak`, ic:`📣`, c:`#2e9e6b`, scenes:[
+  [`🌍`,`Bilal bin Rabah adalah seorang budak berasal dari Habasyah yang tinggal di Makkah. Ia masuk Islam ketika banyak orang masih menyembah berhala.`],
+  [`☀️`,`Tuannya, Umayyah bin Khalaf, menyiksanya di padang pasir yang panas dengan batu besar di dadanya.`],
+  [`☝️`,`Dalam siksaan itu Bilal hanya mengulang satu kata, "Ahad, ahad," yang berarti Allah Maha Esa.`],
+  [`🪙`,`Abu Bakar membeli Bilal lalu memerdekakannya.`],
+  [`📣`,`Setelah hijrah, azan disyariatkan. Nabi ﷺ meminta Bilal mengumandangkannya karena suaranya yang merdu. Ia menjadi muazin pertama.`],
+  [`🕋`,`Pada hari Fathu Makkah, Bilal mengumandangkan azan di atas Ka'bah. Kemuliaan tidak ditentukan asal-usul, tetapi takwa.`]],
+  h:{ar:`إِنَّ أَكْرَمَكُمْ عِندَ اللَّهِ أَتْقَاكُمْ`, id:`Sesungguhnya yang paling mulia di antara kamu di sisi Allah ialah yang paling bertakwa.`, src:`QS. Al-Hujurat: 13`}},
+ { id:`mushab`, t:`Mush'ab bin Umair`, s:`Dai muda penakluk hati Madinah`, ic:`📖`, c:`#c2570c`, scenes:[
+  [`👕`,`Mush'ab bin Umair adalah pemuda Makkah yang tampan dan hidup berkecukupan, dikenal dengan pakaian dan wewangiannya.`],
+  [`🌟`,`Ia memeluk Islam secara sembunyi-sembunyi. Keluarganya menentang dan menahannya.`],
+  [`🚪`,`Mush'ab memilih iman. Hidupnya menjadi sederhana, tetapi hatinya kuat.`],
+  [`🐫`,`Setelah Baiat Aqabah pertama, Nabi ﷺ mengutus Mush'ab ke Madinah untuk mengajarkan Al-Qur'an dan Islam.`],
+  [`🏘️`,`Dengan ilmu dan akhlak yang lembut, ia berdakwah dari rumah ke rumah. Tokoh seperti Usaid bin Hudhair dan Sa'ad bin Mu'adz masuk Islam, lalu Islam menyebar di Madinah.`],
+  [`⛰️`,`Mush'ab gugur sebagai syuhada dalam Perang Uhud sambil membawa panji Islam. Seorang dai muda bisa mengubah sebuah kota.`]],
+  h:{ar:`مِّنَ الْمُؤْمِنِينَ رِجَالٌ صَدَقُوا مَا عَاهَدُوا اللَّهَ عَلَيْهِ`, id:`Di antara orang-orang mukmin itu ada orang-orang yang menepati apa yang telah mereka janjikan kepada Allah.`, src:`QS. Al-Ahzab: 23`}}
+];
+
+/* ---------- kosakata gem match ---------- */
+const VOCAB = [
+ [`صَلَاة`,`Prayer`,`Shalat`],[`صَوْم`,`Fasting`,`Puasa`],[`زَكَاة`,`Almsgiving`,`Zakat`],[`حَجّ`,`Pilgrimage`,`Haji`],
+ [`كِتَاب`,`Book`,`Buku`],[`عِلْم`,`Knowledge`,`Ilmu`],[`صَبْر`,`Patience`,`Sabar`],[`شُكْر`,`Gratitude`,`Syukur`],
+ [`إِيمَان`,`Faith`,`Iman`],[`رَحْمَة`,`Mercy`,`Kasih sayang`],[`نُور`,`Light`,`Cahaya`],[`جَنَّة`,`Paradise`,`Surga`],
+ [`مَسْجِد`,`Mosque`,`Masjid`],[`مَاء`,`Water`,`Air`],[`أُمّ`,`Mother`,`Ibu`],[`أَب`,`Father`,`Ayah`],
+ [`صَدِيق`,`Friend`,`Teman`],[`سَلَام`,`Peace`,`Damai`],[`دُعَاء`,`Supplication`,`Doa`],[`تَوْبَة`,`Repentance`,`Taubat`],
+ [`صِدْق`,`Honesty`,`Jujur`],[`أَمَانَة`,`Trust`,`Amanah`],[`عَدْل`,`Justice`,`Adil`],[`نَبِيّ`,`Prophet`,`Nabi`],
+ [`مَلَك`,`Angel`,`Malaikat`],[`يَوْم`,`Day`,`Hari`],[`لَيْل`,`Night`,`Malam`],[`شَمْس`,`Sun`,`Matahari`],
+ [`قَمَر`,`Moon`,`Bulan`],[`سَمَاء`,`Sky`,`Langit`],[`أَرْض`,`Earth`,`Bumi`],[`دَعْوَة`,`Invitation / Call`,`Dakwah`]
+].map((v,i)=>({i, ar:v[0], en:v[1], id:v[2]}));
+
+/* ---------- ikon ---------- */
+const IC = {
+  flame:`<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c1 4-3 5-3 9a5 5 0 0 0 10 0c0-2-1-3-2-4 0 2-1 3-2 3 1-3 0-6-3-8z"/></svg>`,
+  gem:`<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 3h12l4 6-10 12L2 9z"/></svg>`,
+  bolt:`<svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg>`,
+  heart:`<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7-4.6-9.3-9A5.2 5.2 0 0 1 12 6.5 5.2 5.2 0 0 1 21.3 12C19 16.4 12 21 12 21z"/></svg>`,
+  home:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M3 11l9-8 9 8v10h-6v-6H9v6H3z"/></svg>`,
+  book:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2zM8 7h7"/></svg>`,
+  gemo:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M6 3h12l4 6-10 12L2 9zM2 9h20"/></svg>`,
+  user:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21a8 8 0 0 1 16 0"/></svg>`,
+  x:`<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>`
+};
+const LOGO = `<svg class="logo" viewBox="0 0 80 80" aria-hidden="true"><rect width="80" height="80" rx="22" fill="var(--brand)"/><path d="M50 18a22 22 0 1 0 0 44 17 17 0 1 1 0-44z" fill="var(--on-brand)"/><path d="M56 26l2.4 5 5.4.8-3.9 3.8.9 5.4-4.8-2.6-4.8 2.6.9-5.4-3.9-3.8 5.4-.8z" fill="var(--gold)"/></svg>`;
+
+/* ---------- util ---------- */
+const $ = s => document.querySelector(s);
+const mem = {};
+function sget(k){ try{ return localStorage.getItem(k); }catch(e){ return mem[k]||null; } }
+function sset(k,v){ try{ localStorage.setItem(k,v); }catch(e){ mem[k]=v; } }
+function sdel(k){ try{ localStorage.removeItem(k); }catch(e){ delete mem[k]; } }
+function esc(s){ return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+const z2 = n => String(n).padStart(2,'0');
+const ymd = d => d.getFullYear()+'-'+z2(d.getMonth()+1)+'-'+z2(d.getDate());
+const today = () => ymd(new Date());
+function addDays(d,n){ const x=new Date(d); x.setDate(x.getDate()+n); return x; }
+function hash32(s){ let h=2166136261>>>0; for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619)>>>0; } return h; }
+function mulberry(a){ return function(){ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+function shuffle(arr,rnd){ rnd=rnd||Math.random; const a=arr.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(rnd()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+async function sha(s){ const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s)); return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join(''); }
+function dailyIds(date){ return shuffle(BANK.map((_,i)=>i), mulberry(hash32('dm|'+date))).slice(0,20); }
+
+/* ---------- state ---------- */
+let USER = null, ST = null, TAB = 'home';
+let L = null, R = null, M = null;
+function blank(){ return {xp:0,gems:0,streak:0,last:'',days:{},stories:{},matchBest:0}; }
+function loadState(u){ try{ return Object.assign(blank(), JSON.parse(sget('dm_u_'+u)||'{}')); }catch(e){ return blank(); } }
+function save(){ if(USER) sset('dm_u_'+USER, JSON.stringify(ST)); }
+function shownStreak(){ const t=today(), y=ymd(addDays(new Date(),-1)); return (ST.last===t||ST.last===y)?ST.streak:0; }
+
+/* ---------- login ---------- */
+function shareUrl(){ return sget('dm_share') || location.href.split('#')[0]; }
+function drawQR(el,url){
+  el.innerHTML='';
+  try{ if(!window.QRCode) throw new Error('x'); new QRCode(el,{text:url,width:176,height:176,colorDark:'#111111',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M}); }
+  catch(e){ el.style.lineHeight='1.4'; el.textContent='QR belum dapat dimuat. Salin tautan di bawah.'; }
+}
+function qrBlock(id){
+  return `<div class="qrbox" id="${id}"></div>
+  <div class="field" style="margin-top:12px"><label for="${id}-u">Tautan aplikasi</label>
+  <input class="input" id="${id}-u" value="${esc(shareUrl())}" inputmode="url" autocomplete="off">
+  <p class="small mute">Tempel tautan yang Anda bagikan dari Claude, lalu perbarui QR agar orang lain bisa memindai.</p>
+  <button class="btn ghost" type="button" data-act="qrupdate" data-id="${id}">Perbarui QR</button></div>`;
+}
+function renderLogin(msg){
+  $('#overlay').innerHTML='';
+  $('#root').innerHTML = `<div class="login">
+    ${LOGO}
+    <div class="center"><h1>Dai Muda</h1><p class="mute" style="font-weight:700">Belajar dakwah setiap hari</p></div>
+    <form id="lf" class="stack" autocomplete="off">
+      <div class="field"><label for="u">Nama pengguna</label><input class="input" id="u" autocapitalize="none" autocomplete="username" spellcheck="false"></div>
+      <div class="field"><label for="p">Kata sandi</label>
+        <div class="row"><input class="input grow" id="p" type="password" autocomplete="current-password">
+        <button class="btn ghost" style="width:auto;padding:12px 14px" type="button" data-act="pw">Lihat</button></div></div>
+      <div class="err" id="err" role="alert">${msg?esc(msg):''}</div>
+      <button class="btn" type="submit">Masuk</button>
+    </form>
+    <details class="qr"><summary>Bagikan akses dengan QR</summary>${qrBlock('qr1')}</details>
+  </div>`;
+  $('#lf').addEventListener('submit', async e=>{
+    e.preventDefault();
+    const u=$('#u').value.trim().toLowerCase(), p=$('#p').value;
+    const acc=USERS[u];
+    let ok=false;
+    try{ ok = !!acc && (await sha('dm1|'+u+'|'+p))===acc.h; }catch(err){ $('#err').textContent='Peramban ini tidak mendukung verifikasi kata sandi.'; return; }
+    if(!ok){ $('#err').textContent='Nama pengguna atau kata sandi salah.'; return; }
+    sset('dm_session',u); enter(u);
+  });
+}
+function enter(u){ USER=u; ST=loadState(u); TAB='home'; renderApp(); }
+
+/* ---------- aplikasi ---------- */
+function chips(){
+  return `<div class="chips">
+   <span class="chip c-flame" title="Beruntun">${IC.flame}${shownStreak()}</span>
+   <span class="chip c-gem" title="Gem">${IC.gem}${ST.gems}</span>
+   <span class="chip c-xp" title="XP">${IC.bolt}${ST.xp}</span></div>`;
+}
+function dalilCard(d){
+  return `<div class="dalil"><div class="kind">${esc(d.k)}</div>${d.ar?`<div class="ar">${esc(d.ar)}</div>`:''}<div class="id">${esc(d.id)}</div><div class="src">${esc(d.src)}</div></div>`;
+}
+function homeTab(){
+  const t=today(), done=ST.days[t];
+  const dod = BANK[hash32('dod|'+t)%BANK.length];
+  const names=['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
+  let week='';
+  for(let i=6;i>=0;i--){ const d=addDays(new Date(),-i), k=ymd(d);
+    week+=`<div class="day ${ST.days[k]?'done':''} ${i===0?'now':''}">${names[d.getDay()]}<i>${ST.days[k]?'✓':d.getDate()}</i></div>`; }
+  return `<div class="top"><div><p class="hi">Assalamu'alaikum,</p><h1>${esc(USERS[USER].name)}</h1></div>${chips()}</div>
+  <div class="stack">
+   <section class="daily">
+     <h2>Latihan harian</h2>
+     <p>${done?`Selesai hari ini: ${done.score} dari 20 benar. Ulangi untuk berlatih lagi.`:`20 soal dengan dalil dari Al-Qur'an, hadis, dan maqolah ulama.`}</p>
+     <button class="btn" data-act="startDaily">${done?'Ulangi latihan':'Mulai'}</button>
+   </section>
+   <section class="card"><h3 style="margin-bottom:10px">7 hari terakhir</h3><div class="week">${week}</div></section>
+   <section><h3 style="margin:0 0 10px">Dalil hari ini</h3>${dalilCard(dod.d)}</section>
+  </div>`;
+}
+function kisahTab(){
+  return `<div class="top"><div><h1>Kisah</h1><p class="hi">Para nabi dan sahabat</p></div>${chips()}</div>
+  <div class="stack">${STORIES.map(s=>`
+    <button class="story" style="--c:${s.c}" data-act="story" data-id="${s.id}">
+      <span class="ic" aria-hidden="true">${s.ic}</span>
+      <span class="grow"><h3>${esc(s.t)}</h3><span class="mute small">${esc(s.s)}</span></span>
+      ${ST.stories[s.id]?`<span class="ok">Selesai</span>`:''}
+    </button>`).join('')}</div>`;
+}
+function gemTab(){
+  return `<div class="top"><div><h1>Gem Match</h1><p class="hi">Arab, Inggris, Indonesia</p></div>${chips()}</div>
+  <div class="stack">
+   <section class="card stack">
+     <p>Cocokkan satu kata Arab, artinya dalam bahasa Inggris, dan artinya dalam bahasa Indonesia. Setiap tiga kartu yang cocok memberi 2 gem.</p>
+     <p class="small mute">Rekor tanpa salah: ${ST.matchBest} gem per permainan</p>
+     <button class="btn gold" data-act="mstart">Main sekarang</button>
+   </section>
+   <section class="card"><h3 style="margin-bottom:8px">Kamus mini (${VOCAB.length} kata)</h3>
+    <div class="scrollx"><table class="vocab"><thead><tr><th>English</th><th>Indonesia</th><th style="text-align:right">عربي</th></tr></thead><tbody>
+     ${VOCAB.map(v=>`<tr><td>${esc(v.en)}</td><td>${esc(v.id)}</td><td class="a">${esc(v.ar)}</td></tr>`).join('')}
+    </tbody></table></div></section>
+  </div>`;
+}
+function profTab(){
+  const n=Object.keys(ST.days).length, ns=Object.keys(ST.stories).length;
+  return `<div class="top"><div class="row"><div class="avatar" aria-hidden="true">${esc(USERS[USER].name.charAt(0))}</div>
+    <div><h1 style="font-size:22px">${esc(USERS[USER].name)}</h1><p class="hi">${esc(USERS[USER].role)} · @${esc(USER)}</p></div></div></div>
+  <div class="stack">
+   <div class="kv"><div><b>${ST.xp}</b><span class="small mute">XP</span></div><div><b>${ST.gems}</b><span class="small mute">Gem</span></div><div><b>${shownStreak()}</b><span class="small mute">Hari beruntun</span></div></div>
+   <div class="kv"><div><b>${n}</b><span class="small mute">Hari latihan</span></div><div><b>${ns}/${STORIES.length}</b><span class="small mute">Kisah</span></div><div><b>${BANK.length}</b><span class="small mute">Bank soal</span></div></div>
+   <section class="card"><h3>Bagikan akses</h3><p class="small mute" style="margin:4px 0 0">Minta orang lain memindai QR ini untuk membuka aplikasi. Mereka tetap perlu akun untuk masuk.</p>${qrBlock('qr2')}</section>
+   <p class="small mute">Materi disusun ringkas untuk belajar. Periksa kembali kutipan dalil dan maqolah kepada ustadz atau guru Anda sebelum disampaikan kepada orang lain.</p>
+   <button class="btn bad" data-act="logout">Keluar</button>
+  </div>`;
+}
+function renderApp(){
+  $('#overlay').innerHTML='';
+  const body = TAB==='home'?homeTab():TAB==='kisah'?kisahTab():TAB==='gem'?gemTab():profTab();
+  const tabs=[['home','Belajar',IC.home],['kisah','Kisah',IC.book],['gem','Gem',IC.gemo],['prof','Profil',IC.user]];
+  $('#root').innerHTML = `<div class="wrap">${body}</div>
+  <nav class="nav" aria-label="Menu utama"><div class="in">${tabs.map(t=>`<button data-act="tab" data-id="${t[0]}" class="${TAB===t[0]?'on':''}" ${TAB===t[0]?'aria-current="page"':''}>${t[2]}${t[1]}</button>`).join('')}</div></nav>`;
+  window.scrollTo(0,0);
+  const q2=$('#qr2'); if(q2) drawQR(q2, shareUrl());
+}
+
+/* ---------- latihan ---------- */
+function startDaily(){ L={ids:dailyIds(today()),i:0,hearts:5,right:0,sel:-1,checked:false,opts:[],res:null}; prepQ(); renderLesson(); }
+function prepQ(){ const q=BANK[L.ids[L.i]]; L.opts=shuffle([{t:q.a,ok:true}].concat(q.w.map(t=>({t,ok:false})))); L.sel=-1; L.checked=false; L.last=null; }
+function renderLesson(){
+  if(L.res){ return renderResult(); }
+  const q=BANK[L.ids[L.i]], total=L.ids.length;
+  const pct=Math.round(L.i/total*100);
+  const opts=L.opts.map((o,i)=>{
+    let cls='opt'; if(L.checked){ if(o.ok) cls+=' right'; else if(i===L.sel) cls+=' wrong'; } else if(i===L.sel) cls+=' sel';
+    return `<button class="${cls}" data-act="opt" data-i="${i}" ${L.checked?'disabled':''}>${esc(o.t)}</button>`; }).join('');
+  let foot;
+  if(!L.checked){ foot=`<div class="lfoot"><button class="btn" data-act="check" ${L.sel<0?'disabled':''}>Periksa</button></div>`; }
+  else { const ok=L.opts[L.sel].ok;
+    foot=`<div class="lfoot ${ok?'ok':'no'}"><div class="verdict">${ok?'Benar!':'Kurang tepat. Jawaban: '+esc(q.a)}</div>${dalilCard(q.d)}<button class="btn ${ok?'':'bad'}" data-act="next" style="margin-top:12px">Lanjut</button></div>`; }
+  $('#overlay').innerHTML=`<div class="screen"><div class="in">
+   <div class="lhead"><button class="iconbtn" data-act="quit" aria-label="Keluar dari latihan">${IC.x}</button>
+    <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="${total}" aria-valuenow="${L.i}"><i style="width:${pct}%"></i></div>
+    <span class="chip c-heart" aria-label="${L.hearts} nyawa">${IC.heart}${L.hearts}</span></div>
+   <div class="lbody"><span class="tag">${esc(q.cat)} · ${L.i+1}/${total}</span><h2>${esc(q.q)}</h2><div class="opts">${opts}</div></div>
+   ${foot}</div></div>`;
+}
+function checkAns(){
+  const ok=L.opts[L.sel].ok; L.checked=true;
+  if(ok) L.right++; else L.hearts--;
+  renderLesson();
+}
+function nextQ(){
+  if(L.hearts<=0){ L.res={fail:true}; return renderResult(); }
+  if(L.i+1>=L.ids.length){ finishDaily(); return; }
+  L.i++; prepQ(); renderLesson();
+}
+function finishDaily(){
+  const t=today(), first=!ST.days[t];
+  const xp=L.right*10+(first?50:0), gems=L.right+(first?20:0);
+  ST.xp+=xp; ST.gems+=gems;
+  if(first){ const y=ymd(addDays(new Date(),-1)); ST.streak = (ST.last===y)?ST.streak+1:1; ST.last=t; }
+  if(!ST.days[t] || ST.days[t].score<L.right) ST.days[t]={score:L.right,total:L.ids.length};
+  save(); L.res={xp,gems,first};
+  renderResult();
+}
+function renderResult(){
+  const r=L.res;
+  if(r.fail){
+    $('#overlay').innerHTML=`<div class="screen"><div class="in pad stack center" style="justify-content:center">
+     <div class="big c-heart" style="margin:0 auto">${IC.heart.replace('<svg','<svg width="72" height="72"')}</div>
+     <h2>Nyawa habis</h2><p class="mute">Kamu menjawab ${L.right} soal dengan benar. Pelajari dalilnya lagi, lalu coba kembali.</p>
+     <button class="btn" data-act="startDaily">Coba lagi</button><button class="btn ghost" data-act="quit">Kembali</button></div></div>`;
+    return;
+  }
+  const total=L.ids.length, msg=L.right===total?'Sempurna. Masya Allah!':L.right>=total*0.8?'Hebat. Terus tingkatkan.':L.right>=total*0.5?'Bagus. Ulangi untuk hasil lebih baik.':'Tetap semangat. Ilmu dibangun sedikit demi sedikit.';
+  $('#overlay').innerHTML=`<div class="screen"><div class="in pad stack center" style="justify-content:center">
+    <p class="small mute" style="font-weight:800;letter-spacing:.08em;text-transform:uppercase">Latihan selesai</p>
+    <div class="big" style="color:var(--brand)">${L.right}/${total}</div><p style="font-weight:800">${msg}</p>
+    <div class="chips" style="justify-content:center"><span class="chip c-xp">${IC.bolt}+${r.xp} XP</span><span class="chip c-gem">${IC.gem}+${r.gems}</span><span class="chip c-flame">${IC.flame}${shownStreak()} hari</span></div>
+    ${r.first?`<p class="small mute">Bonus latihan pertama hari ini sudah ditambahkan.</p>`:''}
+    <button class="btn" data-act="quit">Selesai</button><button class="btn ghost" data-act="startDaily">Ulangi</button></div></div>`;
+}
+
+/* ---------- kisah ---------- */
+function openStory(id){ R={s:STORIES.find(x=>x.id===id), i:0}; renderReader(); }
+function renderReader(){
+  const s=R.s, n=s.scenes.length, end=R.i>=n;
+  const dots=`<div class="dots">${Array.from({length:n+1},(_,k)=>`<i class="${k<=R.i?'on':''}"></i>`).join('')}</div>`;
+  let main, foot;
+  if(!end){ const sc=s.scenes[R.i];
+    main=`<div class="art" style="--c:${s.c}" aria-hidden="true">${sc[0]}</div><p class="scene">${esc(sc[1])}</p>`;
+    foot=`<div class="navrow"><button class="btn ghost" data-act="sprev" ${R.i===0?'disabled':''} style="flex:1">Kembali</button><button class="btn" data-act="snext" style="flex:2">Lanjut</button></div>`;
+  } else {
+    main=`<div class="art" style="--c:${s.c}" aria-hidden="true">${s.ic}</div><h2 style="margin-bottom:12px">Hikmah dan dalil</h2>${dalilCard({k:`Al-Qur'an`,ar:s.h.ar,id:s.h.id,src:s.h.src})}`;
+    foot=`<div class="navrow"><button class="btn ghost" data-act="sprev" style="flex:1">Kembali</button><button class="btn gold" data-act="sdone" style="flex:2">${ST.stories[s.id]?'Tutup':'Selesai +5 gem'}</button></div>`;
+  }
+  $('#overlay').innerHTML=`<div class="screen"><div class="in">
+    <div class="lhead"><button class="iconbtn" data-act="quit" aria-label="Tutup kisah">${IC.x}</button>${dots}</div>
+    <div class="lbody"><span class="tag">${esc(s.t)}</span><div style="height:14px"></div>${main}</div>${foot}</div></div>`;
+}
+
+/* ---------- gem match ---------- */
+function mstart(){
+  const p=shuffle(VOCAB).slice(0,12);
+  M={rounds:[p.slice(0,4),p.slice(4,8),p.slice(8,12)],r:0,mist:0,gems:0,lock:false,fin:false}; msetup(); renderMatch();
+}
+function msetup(){ const ids=M.rounds[M.r].map(w=>w.i); M.cols={ar:shuffle(ids),en:shuffle(ids),id:shuffle(ids)}; M.done=[]; M.sel={ar:null,en:null,id:null}; M.bad=null; }
+function renderMatch(){
+  if(M.fin){
+    const bonus=M.mist===0?5:0;
+    $('#overlay').innerHTML=`<div class="screen"><div class="in pad stack center" style="justify-content:center">
+     <p class="small mute" style="font-weight:800;letter-spacing:.08em;text-transform:uppercase">Gem Match selesai</p>
+     <div class="big c-gem" style="margin:0 auto">${IC.gem.replace('<svg','<svg width="76" height="76"')}</div>
+     <h2>+${M.gems+bonus} gem</h2><p class="mute">${M.mist===0?'Tanpa kesalahan. Bonus 5 gem ditambahkan.':'Kesalahan: '+M.mist+'. Coba lagi tanpa salah untuk bonus 5 gem.'}</p>
+     <button class="btn gold" data-act="mstart">Main lagi</button><button class="btn ghost" data-act="quit">Kembali</button></div></div>`;
+    return;
+  }
+  const col=(k,cls)=>`<div class="mcol">${M.cols[k].map(i=>{ const v=VOCAB[i]; let c='mc '+cls;
+    if(M.done.includes(i)) c+=' done'; else if(M.bad&&M.bad[k]===i) c+=' bad'; else if(M.sel[k]===i) c+=' sel';
+    return `<button class="${c}" data-act="mcard" data-col="${k}" data-i="${i}">${esc(v[k])}</button>`; }).join('')}</div>`;
+  $('#overlay').innerHTML=`<div class="screen"><div class="in">
+   <div class="lhead"><button class="iconbtn" data-act="quit" aria-label="Keluar dari Gem Match">${IC.x}</button>
+    <div class="bar"><i style="width:${Math.round((M.r*4+M.done.length)/12*100)}%"></i></div><span class="chip c-gem">${IC.gem}${M.gems}</span></div>
+   <div class="lbody"><span class="tag">Babak ${M.r+1} dari 3</span><h2>Pilih satu kartu dari tiap kolom yang artinya sama</h2>
+    <div class="mgrid">${col('ar','ar')}${col('en','')}${col('id','')}</div></div></div></div>`;
+}
+function mcard(k,i){
+  if(M.lock||M.done.includes(i)) return;
+  M.sel[k]=(M.sel[k]===i)?null:i;
+  const s=M.sel;
+  if(s.ar!==null&&s.en!==null&&s.id!==null){
+    if(s.ar===s.en&&s.en===s.id){
+      M.done.push(s.ar); M.gems+=2; M.sel={ar:null,en:null,id:null};
+      renderMatch();
+      if(M.done.length>=4){ M.lock=true; setTimeout(()=>{ M.lock=false; if(M.r>=2){ M.fin=true; const bonus=M.mist===0?5:0; ST.gems+=M.gems+bonus; if(M.mist===0) ST.matchBest=Math.max(ST.matchBest,M.gems+bonus); save(); } else { M.r++; msetup(); } renderMatch(); },450); }
+    } else {
+      M.mist++; M.bad=Object.assign({},s); M.sel={ar:null,en:null,id:null}; M.lock=true; renderMatch();
+      setTimeout(()=>{ M.bad=null; M.lock=false; renderMatch(); },520);
+    }
+  } else renderMatch();
+}
+
+/* ---------- aksi ---------- */
+document.addEventListener('click', e=>{
+  const t=e.target.closest('[data-act]'); if(!t) return;
+  const a=t.dataset.act;
+  if(a==='tab'){ TAB=t.dataset.id; renderApp(); }
+  else if(a==='startDaily') startDaily();
+  else if(a==='opt'){ if(!L.checked){ L.sel=+t.dataset.i; renderLesson(); } }
+  else if(a==='check'){ if(L.sel>=0&&!L.checked) checkAns(); }
+  else if(a==='next') nextQ();
+  else if(a==='quit'){ L=null; R=null; M=null; renderApp(); }
+  else if(a==='story') openStory(t.dataset.id);
+  else if(a==='snext'){ R.i++; renderReader(); }
+  else if(a==='sprev'){ if(R.i>0){ R.i--; renderReader(); } }
+  else if(a==='sdone'){ if(!ST.stories[R.s.id]){ ST.stories[R.s.id]=true; ST.gems+=5; save(); } R=null; renderApp(); }
+  else if(a==='mstart') mstart();
+  else if(a==='mcard') mcard(t.dataset.col, +t.dataset.i);
+  else if(a==='logout'){ sdel('dm_session'); USER=null; ST=null; renderLogin(); }
+  else if(a==='pw'){ const p=$('#p'); const show=p.type==='password'; p.type=show?'text':'password'; t.textContent=show?'Sembunyi':'Lihat'; }
+  else if(a==='qrupdate'){ const id=t.dataset.id, v=$('#'+id+'-u').value.trim(); if(v){ sset('dm_share',v); } drawQR($('#'+id), v||shareUrl()); }
+});
+document.addEventListener('toggle', e=>{ const d=e.target; if(d&&d.classList&&d.classList.contains('qr')&&d.open){ const b=d.querySelector('#qr1'); if(b&&!b.firstChild) drawQR(b, shareUrl()); } }, true);
+
+/* ---------- mulai ---------- */
+(function init(){
+  const s=sget('dm_session');
+  if(s && USERS[s]) enter(s); else renderLogin();
+})();
+</script>
+</body>
+</html>
